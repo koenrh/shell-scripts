@@ -3,88 +3,64 @@
 readonly program="$(basename "${0}")"
 
 usage() {
-  echo "
-    usage: ${program} [options] [output_directory]
-    options:
-      -u <username>, --user <username>         Your GitHub username.
-      -p <password, --password <password>      Your GitHub password or personal access token.
-      -o <organisation>, --org <organisation>  Name of your GitHub organisation name.
-      -r <repository>, --repo <repository>     Name of the repsitory you want to archive.
-      -h, --help
-  " | sed -E 's/^ {4}//'
+  echo "usage: ${program} <organisation> <repository> [output_directory]"
+  echo
+  echo "NOTE: in order to download GitHub issues, add your GitHub username,"\
+    "and password or personal access token to your .netrc file:"
+  echo
+  echo "  machine api.github.com"
+  echo "    login <username>"
+  echo "    password <password>"
 }
 
-archive() {
-   tar czf "$1.tar.gz" "$1" && rm -rf "$1"
-}
-
-while [[ "${1}" ]]; do
-  case "${1}" in
-    -h | --help)
-      usage
-      exit 0
-      ;;
-    -o | --org)
-      organisation="${2}"
-      shift
-      ;;
-    -r | --repo)
-      repository="${2}"
-      shift
-      ;;
-    -u | --user)
-      user="${2}"
-      shift
-      ;;
-    -p | --password)
-      password="${2}"
-      shift
-      ;;
-
-    -*)
-      syntax_error "unrecognised option: ${1}"
-      ;;
-    *)
-      break
-      ;;
-  esac
-  shift
-done
-
-if [ ! "$user" ] || [ ! "$password" ] || [ ! "$organisation" ] || [ ! "$repository" ]
+if (( $# < 2 ))
 then
   usage
   exit 1
 fi
 
-output_dir=${1-"."}
+org=$1
+repo=$2
+output_dir=${3-"."}
 
-if [[ -z "$output_dir" ]]; then
-  mkdir -p "$output_dir"
+if [ ! -d "$output_dir" ]; then
+  echo "specified output directory does not exist."
+  exit 1
 fi
+
+working_dir=$(mktemp -d -t "$program")
+pushd "$working_dir"
+
+#if [[ -z "$output_dir" ]]; then
+#  mkdir -p "$output_dir"
+#fi
 
 timestamp=$(date "+%Y%m%d%H%M")
 
 # code
-git clone --mirror "https://github.com/$organisation/$repository.git" \
-  "$output_dir/$organisation-$repository-$timestamp.git"
+git clone --mirror "https://github.com/$org/$repo.git" \
+  "$org-$repo-$timestamp.git"
 
 # wiki
-git clone --mirror "https://github.com/$organisation/$repository.wiki.git" \
-  "$output_dir/$organisation-$repository.wiki-$timestamp.git"
+git clone --mirror "https://github.com/$org/$repo.wiki.git" \
+  "$org-$repo.wiki-$timestamp.git"
 
 # issues
-curl --silent --disable -u "$user:$password" \
-  "https://api.github.com/repos/$organisation/$repository/issues" \
-  > "$output_dir/$organisation-$repository.issues-$timestamp.json"
+curl --silent --disable --netrc \
+  "https://api.github.com/repos/$org/$repo/issues" \
+  > "$org-$repo.issues-$timestamp.json"
 
 # create archive
-tar czf "$output_dir/$organisation-$repository-$timestamp.tar.gz" \
-  "$output_dir/$organisation-$repository-$timestamp.git" \
-  "$output_dir/$organisation-$repository.wiki-$timestamp.git" \
-  "$output_dir/$organisation-$repository.issues-$timestamp.json"
+tar czf "$org-$repo-$timestamp.tar.gz" \
+  "$org-$repo-$timestamp.git" \
+  "$org-$repo.wiki-$timestamp.git" \
+  "$org-$repo.issues-$timestamp.json"
+
+mv "$working_dir/$org-$repo-$timestamp.tar.gz" "$output_dir"
 
 # remove remnants
-rm -rf "$output_dir/$organisation-$repository-$timestamp.git" \
-  "$output_dir/$organisation-$repository.wiki-$timestamp.git" \
-  "$output_dir/$organisation-$repository.issues-$timestamp.json"
+rm -rf "$org-$repo-$timestamp.git" \
+  "$org-$repo.wiki-$timestamp.git" \
+  "$org-$repo.issues-$timestamp.json"
+
+popd
