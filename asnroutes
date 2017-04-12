@@ -1,0 +1,65 @@
+#!/bin/bash
+
+shopt -s nocasematch
+readonly program="$(basename "${0}")"
+
+usage() {
+  cat <<EOF
+usage: $program [options]
+
+options:
+  -a <num>, --asn <num>    The autonomous system number.
+  -4, --ipv4               IPv4 routes only.
+  -6, --ipv6               IPv6 routes only.
+  -h, --help               Show this help message.
+EOF
+}
+
+if [[ -z "$1" ]]; then
+  usage
+  exit 1
+fi
+
+while [[ "$1" ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -a | --asn)
+      asn="$2"
+      shift
+      ;;
+    -4 | --ipv4)
+      ipv4=true
+      shift
+      ;;
+    -6 | --ipv6)
+      ipv6=true
+      shift
+      ;;
+    -*)
+      syntax_error "unrecognized option: $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+if [[ ! $asn =~ ^(:?as)?[0-9]+$ ]]; then
+  echo 'No valid ASN specified.'
+  usage
+  exit 1
+fi
+
+output=$(whois -h whois.radb.net -- -i origin "$asn")
+
+if [ "$ipv4" = true ] ; then
+  echo "$output" | gawk '/route:/ { print $2}'
+elif [ "$ipv6" = true ] ; then
+  echo "$output" | gawk '/route6:/ { print $2}'
+else
+  echo "$output" | gawk '/route6?:/ { print $2}'
+fi
