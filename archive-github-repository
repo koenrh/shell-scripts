@@ -21,7 +21,7 @@ fi
 
 org=$1
 repo=$2
-output_dir=${3-"."}
+output_dir=${3:-$PWD}
 
 if [ ! -d "$output_dir" ]; then
   echo "specified output directory does not exist."
