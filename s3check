@@ -1,0 +1,48 @@
+#!/bin/bash
+if [ -z "$*" ]
+then
+  echo "No bucket name provided."
+  exit 1
+fi
+
+export AWS_DEFAULT_REGION="eu-central-1"
+
+RED=$(tput setaf 1)
+RESET=$(tput sgr0)
+
+bucket="$1"
+
+# Get bucket ACL
+if aws s3api get-bucket-acl --bucket "$bucket" --no-sign-request > /dev/null
+then
+  echo -e "all users: ${RED}get-bucket-acl${RESET}"
+fi
+
+if aws s3api get-bucket-acl --bucket "$bucket" > /dev/null
+then
+  echo -e "authenticated users: ${RED}get-bucket-acl${RESET}"
+fi
+
+# List objects
+if aws s3api list-objects --bucket "$bucket" --max-items 1 --no-sign-request >/dev/null
+then
+  echo -e "all users: ${RED}list-objects${RESET}"
+fi
+
+if aws s3api list-objects --bucket "$bucket" --max-items 1 >/dev/null
+then
+  echo -e "authenticated users: ${RED}list-objects${RESET}"
+fi
+
+key=$(hexdump -n 16 -v -e '/1 "%02x"' /dev/urandom)
+if echo "1" | aws s3 cp --no-sign-request - "s3://$bucket/$key" >/dev/null
+then
+  echo -e "all users: ${RED}put-object${RESET}"
+  aws s3 rm "s3://$bucket/$key" &>/dev/null
+fi
+
+if echo "1" | aws s3 cp - "s3://$bucket/$key" >/dev/null
+then
+  echo -e "auth users: ${RED}put-object${RESET}"
+  aws s3 rm "s3://$bucket/$key" &>/dev/null
+fi
