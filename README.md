@@ -12,6 +12,10 @@ Archive public and private GitHub repositories, including source code, issues, a
 
 Get a list of all announced prefixes for a given ASN.
 
+### getrdslogs
+
+Download all logs for a given Amazon RDS instance.
+
 ### s3check
 
 Check the public permissions of an Amazon S3 bucket.
