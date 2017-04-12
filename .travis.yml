@@ -1,0 +1,15 @@
+language: bash
+sudo: false
+
+addons:
+  apt:
+    sources:
+      - debian-sid
+    packages:
+      - shellcheck
+
+script:
+  - grep -Erl --exclude-dir=".git" "#!/bin/(ba)?sh" . | xargs shellcheck
+
+notifications:
+  email: false
