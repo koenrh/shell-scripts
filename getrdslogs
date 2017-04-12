@@ -1,0 +1,63 @@
+#!/bin/bash
+
+readonly program="$(basename "${0}")"
+
+usage() {
+  cat <<EOF
+usage: $program [options]
+
+options:
+  -i <string>, --instance-id <string>  The database instance identifier.
+  -r <string>, --region <string>       The AWS region to use.
+  -h, --help                           Show this help message.
+EOF
+}
+
+if [[ -z "$1" ]]; then
+  usage
+  exit 1
+fi
+
+while [[ "$1" ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -i | --instance-id)
+      db_instance_id="$2"
+      shift
+      ;;
+    -r | --region)
+      region="$2"
+      shift
+      ;;
+    -*)
+      syntax_error "unrecognized option: $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+if [[ -z "${db_instance_id}" ]]; then
+  echo 'A database instance identifier is required.'
+  usage
+  exit 1
+fi
+
+[[ -z "${region}" ]] && region="eu-central-1"
+
+# Make a directory
+if [ ! -d "${db_instance_id}" ]; then
+  mkdir "${db_instance_id}"
+fi
+
+for i in $(aws rds describe-db-log-files --db-instance-identifier "${db_instance_id}" --output text --region "${region}" | cut -f3); do
+  FILE=$(basename "${i}")
+  if [ ! -e "${db_instance_id}/${FILE}" ]; then
+    aws rds download-db-log-file-portion --db-instance-identifier "${db_instance_id}" --log-file-name "${i}" --output text --region "${region}" > "${db_instance_id}/${FILE}"
+  fi
+done
