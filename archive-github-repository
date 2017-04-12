@@ -63,20 +63,28 @@ if [[ -z "$output_dir" ]]; then
   mkdir -p "$output_dir"
 fi
 
-TIMESTAMP=$(date "+%Y%m%d%H%M")
+timestamp=$(date "+%Y%m%d%H%M")
 
 # code
 git clone --mirror "https://github.com/$organisation/$repository.git" \
-  "$output_dir/$organisation-$repository-$TIMESTAMP.git" && \
-  archive "$output_dir/$organisation-$repository-$TIMESTAMP.git"
+  "$output_dir/$organisation-$repository-$timestamp.git"
 
 # wiki
 git clone --mirror "https://github.com/$organisation/$repository.wiki.git" \
-  "$output_dir/$organisation-$repository.wiki-$TIMESTAMP.git" && \
-  archive "$output_dir/$organisation-$repository.wiki-$TIMESTAMP.git"
+  "$output_dir/$organisation-$repository.wiki-$timestamp.git"
 
 # issues
 curl --silent --disable -u "$user:$password" \
   "https://api.github.com/repos/$organisation/$repository/issues" \
-  > "$output_dir/$organisation-$repository.issues-$TIMESTAMP" && \
-  archive "$output_dir/$organisation-$repository.issues-$TIMESTAMP"
+  > "$output_dir/$organisation-$repository.issues-$timestamp.json"
+
+# create archive
+tar czf "$output_dir/$organisation-$repository-$timestamp.tar.gz" \
+  "$output_dir/$organisation-$repository-$timestamp.git" \
+  "$output_dir/$organisation-$repository.wiki-$timestamp.git" \
+  "$output_dir/$organisation-$repository.issues-$timestamp.json"
+
+# remove remnants
+rm -rf "$output_dir/$organisation-$repository-$timestamp.git" \
+  "$output_dir/$organisation-$repository.wiki-$timestamp.git" \
+  "$output_dir/$organisation-$repository.issues-$timestamp.json"
