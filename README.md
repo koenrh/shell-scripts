@@ -1,5 +1,7 @@
 # Scripts
 
+[![Build Status](https://travis-ci.org/koenrh/shell-scripts.svg?branch=master)](https://travis-ci.org/koenrh/shell-scripts)
+
 The most straightforward way to install these scripts is through [this repository](https://github.com/koenrh/homebrew-scripts).
 
 ### archive-github-repository
