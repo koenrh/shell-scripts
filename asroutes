@@ -5,20 +5,20 @@ readonly program="$(basename "${0}")"
 
 usage() {
   cat <<EOF
-usage: $program [options]
+usage: $program [options] <asn>
 
 options:
-  -a <num>, --asn <num>    The autonomous system number.
   -4, --ipv4               IPv4 routes only.
   -6, --ipv6               IPv6 routes only.
   -h, --help               Show this help message.
 EOF
 }
 
-if [[ -z "$1" ]]; then
-  usage
+syntax_error() {
+  echo "${program}: ${1}"
+  echo "${program}: try '${program} --help' for more information."
   exit 1
-fi
+}
 
 while [[ "$1" ]]; do
   case "$1" in
@@ -26,20 +26,14 @@ while [[ "$1" ]]; do
       usage
       exit 0
       ;;
-    -a | --asn)
-      asn="$2"
-      shift
-      ;;
     -4 | --ipv4)
       ipv4=true
-      shift
       ;;
     -6 | --ipv6)
       ipv6=true
-      shift
       ;;
     -*)
-      syntax_error "unrecognized option: $1"
+      syntax_error "invalid option -- $1"
       ;;
     *)
       break
@@ -47,6 +41,13 @@ while [[ "$1" ]]; do
   esac
   shift
 done
+
+if [[ -z ${1} ]]; then
+usage
+  exit 1
+fi
+
+asn="${1}"
 
 if [[ ! $asn =~ ^(:?as)?[0-9]+$ ]]; then
   echo 'No valid ASN specified.'
