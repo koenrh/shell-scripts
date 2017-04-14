@@ -8,7 +8,7 @@ The most straightforward way to install these scripts is through [this repositor
 
 Archive public and private GitHub repositories, including source code, issues, and wiki pages.
 
-### asnroutes
+### asroutes
 
 Get a list of all announced prefixes for a given ASN.
 
