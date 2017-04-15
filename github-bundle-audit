@@ -50,7 +50,7 @@ audit_organisation() {
     done
   fi
 
-  printf "organisation '$organisation': $(echo -n "$repositories" | wc -l | tr -d '[:space:]') repositories\n\n"
+  printf "organisation '%s': %s repositories\n\n" "$organisation" "$(echo -n "$repositories" | wc -l | tr -d '[:space:]')"
 
   for repository in $repositories
   do
