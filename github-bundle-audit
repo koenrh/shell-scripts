@@ -38,11 +38,12 @@ audit_organisation() {
 }
 
 audit_repository() {
-  local statuses
+  local statuses, tmp_dir
+
   local organisation="$1"
   local repository="$2"
 
-  local tmp_dir=$(mktemp -d -t "$program")
+  tmp_dir=$(mktemp -d -t "$program")
 
   printf "%sauditing%s: %s\n" "$(tput setaf 6)" "$(tput sgr 0)" "$organisation/$repository"
 
