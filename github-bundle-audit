@@ -42,13 +42,18 @@ audit_repository() {
   local organisation="$1"
   local repository="$2"
 
+  local tmp_dir=$(mktemp -d -t "$program")
+
   printf "%sauditing%s: %s\n" "$(tput setaf 6)" "$(tput sgr 0)" "$organisation/$repository"
 
-  statuses=$(curl -s --disable --netrc --write-out "%{http_code}" -O "https://raw.githubusercontent.com/$organisation/$repository/master/{Gemfile,Gemfile.lock}")
+  statuses=$(curl -s --disable --netrc --write-out "%{http_code}" \
+    -o "$tmp_dir/#1" "https://raw.githubusercontent.com/$organisation/$repository/master/{Gemfile,Gemfile.lock}")
 
   if [ "$statuses" = 200200 ]; then
+    pushd "$tmp_dir" &> /dev/null
     bundle-audit check
     rm Gemfile Gemfile.lock
+    popd &> /dev/null
   else
     printf "%sno Gemfile and/or Gemfile.lock%s" "$(tput setaf 3)" "$(tput sgr 0)"
   fi
