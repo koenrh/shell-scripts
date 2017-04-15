@@ -4,11 +4,6 @@
 
 The most straightforward way to install these scripts is through [this repository](https://github.com/koenrh/homebrew-scripts).
 
-### archive-github-repository
-
-Archive public and private GitHub repositories, including source code, issues,
-and wiki pages.
-
 ### asroutes
 
 Get a list of all announced prefixes for a given ASN.
@@ -16,6 +11,11 @@ Get a list of all announced prefixes for a given ASN.
 ### getrdslogs
 
 Download all logs for a given Amazon RDS instance.
+
+### github-archive-repository
+
+Archive public and private GitHub repositories, including source code, issues,
+and wiki pages.
 
 ### github-bundle-audit
 
