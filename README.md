@@ -17,6 +17,10 @@ Get a list of all announced prefixes for a given ASN.
 
 Download all logs for a given Amazon RDS instance.
 
+### github-bundle-audit
+
+Audit Gemfiles in all repositories in a GitHub organisation.
+
 ### purl
 
 Get basic request and response timing information.
