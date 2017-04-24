@@ -8,8 +8,7 @@ addons:
     packages:
       - shellcheck
 
-script:
-  - grep -Erl --exclude-dir=".git" "#!/bin/(ba)?sh" . | xargs shellcheck
+script: script/test
 
 notifications:
   email: false

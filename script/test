@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+grep -Erl --exclude-dir=".git" "#!/bin/(ba)?sh" . | xargs shellcheck
