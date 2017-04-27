@@ -6,7 +6,7 @@ This repository contains a bunch of shell scripts I have written that others may
 
 ### asroutes
 
-Get a list of all announced prefixes for a given ASN.
+Get a list of all announced prefixes for a given autonomous system number (ASN).
 
 ### getrdslogs
 
@@ -15,7 +15,7 @@ Download all logs for a given Amazon RDS instance.
 ### github-archive-repository
 
 Archive public and private GitHub repositories, including source code, issues,
-and wiki pages.
+pull requests, and wiki pages.
 
 ### github-bundle-audit
 
