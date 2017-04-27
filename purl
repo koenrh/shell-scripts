@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -euo pipefail
+IFS=$'\n\t'
+
 readonly program="$(basename "${0}")"
 
 if [[ -z "$1" ]]; then
@@ -7,7 +10,12 @@ if [[ -z "$1" ]]; then
   exit 1
 fi
 
-# source: https://blog.josephscott.org/2011/10/14/timing-details-with-curl/
+url=${BASH_ARGV[0]}
+
+args=("$@")
+unset "args[${#args[@]}-1]"
+
+# source: https://git.io/v9GCa
 format="    time_namelookup:  %{time_namelookup}
        time_connect:  %{time_connect}
     time_appconnect:  %{time_appconnect}
@@ -17,4 +25,8 @@ format="    time_namelookup:  %{time_namelookup}
                     ---------
          time_total:  %{time_total}"
 
-curl -w "$format" -o /dev/null -s "$1"
+args+=(-w "$format")
+args+=(-o /dev/null)
+args+=(-s)
+
+curl "${args[@]}" "$url"
