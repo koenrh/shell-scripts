@@ -2,7 +2,11 @@
 
 [![Build Status](https://travis-ci.org/koenrh/shell-scripts.svg?branch=master)](https://travis-ci.org/koenrh/shell-scripts)
 
-This repository contains a bunch of shell scripts I have written that others may find useful. The most straightforward way to install these scripts is through [this Homebrew tap](https://github.com/koenrh/homebrew-scripts).
+This repository contains a bunch of shell scripts I have written that others may
+find useful. The most straightforward way to install these scripts is through
+[this Homebrew tap](https://github.com/koenrh/homebrew-scripts).
+
+## Scripts
 
 ### asroutes
 
@@ -19,7 +23,7 @@ pull requests, and wiki pages.
 
 ### github-bundle-audit
 
-Audit Gemfiles in all repositories in a GitHub organisation.
+Audit Ruby Gemfiles in all repositories in a GitHub organisation.
 
 ### purl
 
