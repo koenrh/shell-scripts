@@ -1,6 +1,11 @@
 #!/bin/bash
 
-readonly program="$(basename "${0}")"
+set -euo pipefail
+IFS=$'\n\t'
+
+readonly program="$(basename "$0")"
+readonly working_dir=$(mktemp -d -t "$program")
+readonly log_file="/tmp/$program.log"
 
 usage() {
   echo "usage: ${program} <organisation> <repository> [output_directory]"
@@ -13,54 +18,92 @@ usage() {
   echo "    password <password>"
 }
 
+info()    { echo "[INFO]    $*" | tee -a "$log_file" >&2 ; }
+warning() { echo "[WARNING] $*" | tee -a "$log_file" >&2 ; }
+error()   { echo "[ERROR]   $*" | tee -a "$log_file" >&2 ; }
+fatal()   { echo "[FATAL]   $*" | tee -a "$log_file" >&2 ; exit 1 ; }
+
+cleanup() {
+  rm -rf "$working_dir"
+}
+
+trap cleanup EXIT
+
 if (( $# < 2 ))
 then
   usage
   exit 1
 fi
 
-org=$1
-repo=$2
-output_dir=${3:-$PWD}
+readonly org=$1
+readonly repo=$2
+
+readonly output_dir=${3:-$PWD}
+readonly timestamp=$(date "+%Y%m%d%H%M")
+
+readonly repo_url="https://github.com/$org/$repo.git"
+readonly wiki_repo_url="https://github.com/$org/$repo.wiki.git"
+readonly issues_url="https://api.github.com/repos/$org/$repo/issues?state=all&per_page=100"
+
+readonly repo_dir_name="$org-$repo"
+readonly wiki_repo_dir_name="${repo_dir_name}_wiki"
+readonly issues_file_name="${repo_dir_name}_issues"
+
+readonly archive_file_name="$org-$repo-$timestamp"
 
 if [ ! -d "$output_dir" ]; then
-  echo "specified output directory does not exist."
-  exit 1
+  fatal "specified output directory does not exist."
 fi
 
-working_dir=$(mktemp -d -t "$program")
+info "using working directory: $working_dir"
 pushd "$working_dir"
 
-#if [[ -z "$output_dir" ]]; then
-#  mkdir -p "$output_dir"
-#fi
+# archive code
+info "cloning repository: $repo_url"
+git clone --mirror "$repo_url" "$repo_dir_name"
 
-timestamp=$(date "+%Y%m%d%H%M")
+# archive wiki
+info "cloning wiki repository: $wiki_repo_url"
+git clone --mirror "$wiki_repo_url" "$wiki_repo_dir_name" || true
 
-# code
-git clone --mirror "https://github.com/$org/$repo.git" \
-  "$org-$repo-$timestamp.git"
+# archive issues and pull requests
+link=$(curl --silent --netrc --head "$issues_url" | grep '^Link:' || true)
 
-# wiki
-git clone --mirror "https://github.com/$org/$repo.wiki.git" \
-  "$org-$repo.wiki-$timestamp.git"
+if [ -z "$link" ]; then
+  info "downloading issues and pull requests: $issues_url"
+  curl --silent --disable --netrc "$issues_url" \
+    > "$issues_file_name.json"
+else
+  page=1
+  last_page="$(echo "$link" | sed -e 's/^Link:.*page=//g' -e 's/>.*$//g')"
 
-# issues
-curl --silent --disable --netrc \
-  "https://api.github.com/repos/$org/$repo/issues" \
-  > "$org-$repo.issues-$timestamp.json"
+  while [ "$page" -le "$last_page" ]; do
+    info "downloading issues and pull requests: $issues_url&page=$page"
+    curl --silent --disable --netrc "$issues_url&page=$page" \
+      > "$issues_file_name-$page.json"
+    page=$((page + 1))
+  done
+
+  cat "$issues_file_name-"*.json | jq -s add > "$issues_file_name.json"
+fi
+
+# only archive files and directories that actually do exist
+files=()
+
+if [ -d "$repo_dir_name" ]; then
+  files+=("$repo_dir_name")
+fi
+
+if [ -d "$wiki_repo_dir_name" ]; then
+  files+=("$wiki_repo_dir_name")
+fi
+
+if [ -f "$issues_file_name.json" ]; then
+  files+=("$issues_file_name.json")
+fi
 
 # create archive
-tar czf "$org-$repo-$timestamp.tar.gz" \
-  "$org-$repo-$timestamp.git" \
-  "$org-$repo.wiki-$timestamp.git" \
-  "$org-$repo.issues-$timestamp.json"
-
-mv "$working_dir/$org-$repo-$timestamp.tar.gz" "$output_dir"
-
-# remove remnants
-rm -rf "$org-$repo-$timestamp.git" \
-  "$org-$repo.wiki-$timestamp.git" \
-  "$org-$repo.issues-$timestamp.json"
+tar czf "$archive_file_name.tar.gz" "${files[@]}"
+mv "$archive_file_name.tar.gz" "$output_dir"
 
 popd
