@@ -2,9 +2,22 @@
 
 [![Build Status](https://travis-ci.org/koenrh/shell-scripts.svg?branch=master)](https://travis-ci.org/koenrh/shell-scripts)
 
-This repository contains a bunch of shell scripts I have written that others may
-find useful. The most straightforward way to install these scripts is through
-[this Homebrew tap](https://github.com/koenrh/homebrew-scripts).
+This repository contains a bunch of random shell scripts I have written that others
+may find useful.
+
+## Installation
+
+If you're on macOS or Linux, the most straightforward way to install any of these
+scripts is using [Homebrew](https://brew.sh/) and [Linuxbrew](http://linuxbrew.sh/)
+respectively, and the [koenrh/scripts](https://github.com/koenrh/homebrew-scripts)
+"tap".
+
+```bash
+brew tap koenrh/scripts
+
+# Example: install 'asnroutes'
+brew install asnroutes
+```
 
 ## Scripts
 
