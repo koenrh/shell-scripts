@@ -25,6 +25,11 @@ brew install asroutes
 
 Get a list of all announced prefixes for a given autonomous system number (ASN).
 
+### cleanup-wireless-networks
+
+Remove the associations for all wireless networks. Optionally, specify a list of
+wireless networks to preserve.
+
 ### getrdslogs
 
 Download all logs for a given Amazon RDS instance.
