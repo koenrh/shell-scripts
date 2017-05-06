@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=
+
+readonly program="$(basename "$0")"
+readonly log_file="/tmp/$program.log"
+
+usage() {
+  echo "usage: $program [options]"
+  echo
+  echo "options:"
+  echo "    -a, --all         Remove all preferred wireless networks."
+  echo "    -l, --list        File containing a list of networks to preserve."
+  echo "    -h, --help        Show this help message."
+}
+
+info()    { echo "[INFO]    $*" | tee -a "$log_file" >&2 ; }
+warning() { echo "[WARNING] $*" | tee -a "$log_file" >&2 ; }
+error()   { echo "[ERROR]   $*" | tee -a "$log_file" >&2 ; }
+fatal()   { echo "[FATAL]   $*" | tee -a "$log_file" >&2 ; exit 1 ; }
+
+remove_all=false
+preservation_list=""
+
+while [[ "${1:-}" ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -a | --all)
+      remove_all=true
+      ;;
+    -l | --list)
+      preservation_list="$2"
+      ;;
+    -*)
+      fatal "invalid option -- $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+readonly interface="en0"
+networks="$(networksetup -listpreferredwirelessnetworks "$interface" | tail -n+2 | tr -d "\t")"
+
+if [ ! -z "$preservation_list" ] && [ ! -f "$preservation_list" ]
+then
+  fatal "specified preservation list file does not exist."
+fi
+
+if [ "$remove_all" = true ]
+then
+  info "removing all preferred wireless networks."
+elif [ -f "$preservation_list" ]
+then
+  info "removing all preferred wireless networks, except the ones on the preservation"\
+    " list."
+  networks="$(grep -vx -f "$preservation_list" <<< "$networks")"
+else
+  usage
+  exit  1
+fi
+
+if [ "$(id -u)" != "0" ]
+then
+  fatal "this script must be run as root, not '$(id -un)'."
+fi
+
+while read -r network
+do
+  networksetup -removepreferredwirelessnetwork "$interface" "$network"
+done <<< "$networks"
