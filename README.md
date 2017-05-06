@@ -15,8 +15,8 @@ respectively, and the [koenrh/scripts](https://github.com/koenrh/homebrew-script
 ```bash
 brew tap koenrh/scripts
 
-# Example: install 'asnroutes'
-brew install asnroutes
+# Example: install 'asroutes' script
+brew install asroutes
 ```
 
 ## Scripts
