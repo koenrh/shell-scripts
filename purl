@@ -5,12 +5,12 @@ IFS=$'\n\t'
 
 readonly program="$(basename "${0}")"
 
-if [[ -z "$1" ]]; then
-  echo "usage: $program <URL>"
+if [ ${#BASH_ARGV[@]} -eq 0 ]; then
+  echo "usage: $program <url>"
   exit 1
 fi
 
-url=${BASH_ARGV[0]}
+readonly url=${BASH_ARGV[0]}
 
 args=("$@")
 unset "args[${#args[@]}-1]"
