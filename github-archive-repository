@@ -104,6 +104,7 @@ fi
 
 # create archive
 tar czf "$archive_file_name.tar.gz" "${files[@]}"
-mv "$archive_file_name.tar.gz" "$output_dir"
 
 popd
+
+mv "$working_dir/$archive_file_name.tar.gz" "$output_dir"
