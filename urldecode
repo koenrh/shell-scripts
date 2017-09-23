@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if (( $# == 0 )) ; then
+  input="$(cat /dev/stdin)"
+else
+  input="$1"
+fi
+
+encoded="${input//+/ }"
+printf "%b" "${encoded//%/\\x}"
