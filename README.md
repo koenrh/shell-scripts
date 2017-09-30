@@ -50,3 +50,11 @@ Get basic request and response timing information.
 ### s3check
 
 Check the public permissions of an Amazon S3 bucket.
+
+### urldecode
+
+Decode percent-encoded strings.
+
+### urlencode
+
+Percent-encode strings.
