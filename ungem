@@ -1,22 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-gem_path="$1"
-gem="$(basename "$gem_path")"
-gem_dir="$(dirname "$gem_path")"
+set -o nounset
+set -o errexit
+set -o errtrace
+set -o pipefail
 
-echo "$gem_path"
-echo "$gem"
-echo "$gem_dir"
+DEFAULT_IFS="${IFS}"
+SAFER_IFS=$'\n\t'
+IFS="${SAFER_IFS}"
 
-pushd "$gem_dir"
+_ME=$(basename "${0}")
 
-mkdir -p "out/$gem"
+_print_help() {
+  cat <<HEREDOC
+usage:
+  ${_ME} <gem>
+  ${_ME} -h | --help
+options:
+  -h --help  Show this screen.
+HEREDOC
+}
 
-tar xf "$gem" -C "out/$gem"
+_ungem() {
+  gem_path="$1"
+  temp_dir="$(mktemp -d)"
 
-pushd "out/$gem"
+  tar xf "$gem_path" -C "$temp_dir"
+  tar xzf "$temp_dir/data.tar.gz" -C "$PWD"
+}
 
-tar xzf "data.tar.gz"
+_main() {
+  if [[ "${1:-}" =~ ^-h|--help$  ]]
+  then
+    _print_help
+  else
+    _ungem "$@"
+  fi
+}
 
-popd
-popd
+_main "$@"
