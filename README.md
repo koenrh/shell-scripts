@@ -51,6 +51,10 @@ Get basic request and response timing information.
 
 Check the public permissions of an Amazon S3 bucket.
 
+### ungem
+
+Unpack a Ruby gem.
+
 ### urldecode
 
 Decode percent-encoded strings.

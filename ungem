@@ -1,0 +1,22 @@
+#!/bin/bash
+
+gem_path="$1"
+gem="$(basename "$gem_path")"
+gem_dir="$(dirname "$gem_path")"
+
+echo "$gem_path"
+echo "$gem"
+echo "$gem_dir"
+
+pushd "$gem_dir"
+
+mkdir -p "out/$gem"
+
+tar xf "$gem" -C "out/$gem"
+
+pushd "out/$gem"
+
+tar xzf "data.tar.gz"
+
+popd
+popd
