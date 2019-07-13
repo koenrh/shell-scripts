@@ -5,6 +5,7 @@ set -o errexit
 set -o errtrace
 set -o pipefail
 
+# shellcheck disable=SC2034
 DEFAULT_IFS="${IFS}"
 SAFER_IFS=$'\n\t'
 IFS="${SAFER_IFS}"
