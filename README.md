@@ -1,7 +1,5 @@
 # Shell scripts
 
-[![Build Status](https://travis-ci.org/koenrh/shell-scripts.svg?branch=master)](https://travis-ci.org/koenrh/shell-scripts)
-
 This repository contains a bunch of random shell scripts I have written that others
 may find useful.
 
@@ -57,8 +55,8 @@ Unpack a Ruby gem.
 
 ### urldecode
 
-Decode percent-encoded strings.
+Decode URL-encoded strings.
 
 ### urlencode
 
-Percent-encode strings.
+URL-encode strings.
