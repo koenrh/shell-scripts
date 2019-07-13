@@ -46,9 +46,9 @@ while [[ "${1:-}" ]]; do
 done
 
 readonly interface="en0"
-networks="$(networksetup -listpreferredwirelessnetworks "$interface" | tail -n+2 | tr -d "\t")"
+networks="$(networksetup -listpreferredwirelessnetworks "$interface" | tail -n+2 | tr -d "\\t")"
 
-if [ ! -z "$preservation_list" ] && [ ! -f "$preservation_list" ]
+if [ -n "$preservation_list" ] && [ ! -f "$preservation_list" ]
 then
   fatal "specified preservation list file does not exist."
 fi

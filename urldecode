@@ -6,5 +6,9 @@ else
   input="$1"
 fi
 
-encoded="${input//+/ }"
-printf "%b" "${encoded//%/\\x}"
+urldecode() {
+  encoded="${1//+/ }"
+  printf "%b" "${encoded//%/\\x}"
+}
+
+urldecode "$input"

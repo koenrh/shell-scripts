@@ -1,17 +1,22 @@
 #!/bin/bash
 
+urlencode() {
+  local LANG=C i=0 c e s="$1"
+
+  while [ $i -lt ${#1} ]; do
+    [ "$i" -eq 0 ] || s="${s#?}"
+    c=${s%"${s#?}"}
+    [ -z "${c#[[:alnum:].~_-]}" ] || c=$(printf "%%%02X" "'$c")
+    e="${e}${c}"
+    i=$((i + 1))
+  done
+  echo "$e"
+}
+
 if (( $# == 0 )) ; then
   input="$(cat /dev/stdin)"
 else
   input="$1"
 fi
 
-length="${#input}"
-
-for (( i = 0; i < length; i++ )); do
-  c="${input:i:1}"
-  case $c in
-    [a-zA-Z0-9.~_-]) printf "%s" "$c" ;;
-    *) printf "%%%02X" "'$c"
-  esac
-done
+urlencode "$input"
