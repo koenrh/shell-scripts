@@ -1,5 +1,7 @@
 # Shell scripts
 
+![](https://github.com/koenrh/shell-scripts/workflows/build/badge.svg)
+
 This repository contains a bunch of random shell scripts I have written that others
 may find useful.
 
