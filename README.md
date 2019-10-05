@@ -9,11 +9,11 @@ may find useful.
 
 If you're on macOS or Linux, the most straightforward way to install any of these
 scripts is using [Homebrew](https://brew.sh/) and [Linuxbrew](http://linuxbrew.sh/)
-respectively, and the [koenrh/scripts](https://github.com/koenrh/homebrew-scripts)
+respectively, and the [koenrh/tools](https://github.com/koenrh/homebrew-tools)
 "tap".
 
 ```bash
-brew tap koenrh/scripts
+brew tap koenrh/tools
 
 # Example: install 'asroutes' script
 brew install asroutes
