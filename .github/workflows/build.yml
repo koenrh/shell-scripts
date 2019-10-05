@@ -1,0 +1,19 @@
+---
+on: push
+name: build
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Bats
+        uses: actions/bin/bats@master
+        with:
+          args: ./test/*.bats
+
+      - name: ShellCheck
+        uses: actions/bin/shellcheck@master
+        with:
+          args: asroutes cleanup-wireless-networks github-archive-repository
+            github-bundle-audit purl s3check ungem urlencode urldecode
